@@ -1,4 +1,3 @@
-import numpy as np
 import pygame as pg
 from locals import *
 
@@ -19,7 +18,7 @@ def rotated(vec: np.ndarray, angle: float):
 
 
 def draw_floor(screen):
-    color = (200, 100, 0)
+    color = Color.BROWN
     pg.draw.rect(screen, color, [0, HEIGHT/2, WIDTH, HEIGHT/2])
 
 
@@ -30,12 +29,13 @@ class Camera:
     def __init__(self, r_0: float = 500.0, l_0: float = 500.0, height: float = 100.0, pos: np.ndarray[int] = CENTER,
                  velocity: float = 10.0, view_vector: np.ndarray = np.array([1.0, 0.0])):
         self.r_0 = r_0
-        self.L_0 = l_0
+        self.l_0 = l_0
         self.height = height
         self.pos = pos
         self.velocity = velocity
         self.view_vec = view_vector
         self.screen_vec = rotated(self.view_vec, np.pi / 2)
+        self.angle_of_vision = np.arctan(self.l_0 / self.r_0)
 
     def move(self, motion_direction):
         # TODO: make collisions with objects
@@ -56,22 +56,17 @@ class Stick:
         self.screen = screen
         self.camera = camera
         self.pos = pos
-        print(type(self.pos[0]))
         self.z = z  # z[0] is bottom point and z[1] is top point
-        self.k = None
-        self.t = None
-        self.r = None
-        Stick.get_t(self)
 
-    def get_t(self):
-        l = self.pos - self.camera.pos
-        self.r = np.dot(l, self.camera.view_vec)
-        if self.r > 0:
+        l_vec = self.pos - self.camera.pos
+        self.r = np.dot(l_vec, self.camera.view_vec)
+        if self.r > 0.0:
             self.k = (self.camera.r_0 / self.r)
-            self.t = self.k * np.dot(self.camera.screen_vec, l)
+            self.t = self.k * np.dot(self.camera.screen_vec, l_vec)
+            self.angle = np.arccos(self.r / np.linalg.norm(l_vec))
         else:
-            # TODO
-            pass
+            self.r = 0.0
+            self.angle = np.pi
 
     def draw_3d(self):
         if self.r > 0:
@@ -79,9 +74,8 @@ class Stick:
             h_up = self.z[1] - self.camera.height
             line_down = CENTER + np.array([self.t, - h_down * self.k])
             line_up = CENTER + np.array([self.t, - h_up * self.k])
-            color = (0, 255, 0)
+            color = Color.GREEN
             line_width = 1
-            print(line_up, self.k)
             pg.draw.line(self.screen, color, line_down, line_up, line_width)
 
 
@@ -114,5 +108,7 @@ def draw(objects: list, screen: pg.Surface, camera: Camera):
     screen.fill(Color.WHITE)
     draw_floor(screen)
     sticks = get_sticks_from_objects(objects, screen, camera)
+    sticks = list(filter(lambda x: abs(x.angle) <= camera.angle_of_vision, sticks))
+    sticks = sorted(sticks, key=lambda x: x.r, reverse=True)
     for stick in sticks:
         stick.draw_3d()
