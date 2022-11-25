@@ -1,3 +1,4 @@
+import numpy as np
 
 # TODO: make font
 
@@ -10,6 +11,7 @@ FPS = 30
 
 # Screen resolution
 WIDTH, HEIGHT = 1500, 750
+CENTER = np.array([WIDTH/2, HEIGHT/2])
 
 
 class Color:
@@ -27,5 +29,5 @@ class Color:
     CITRINE = (204, 204, 0)
 
 
-class TEXT:
+class Text:
     """ Stores game text messages as static variables """
