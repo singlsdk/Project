@@ -1,6 +1,8 @@
 import numpy as np
+from os import path
+import pygame as pg
 
-# TODO: make font
+# TODO: make font class
 
 """
 Defines global scope constants
@@ -12,6 +14,16 @@ FPS = 30
 # Screen resolution
 WIDTH, HEIGHT = 1500, 750
 CENTER = np.array([WIDTH/2, HEIGHT/2])
+
+
+class Font:
+    pg.font.init()
+
+    def __init__(self, name, size):
+        self.name = name
+        self.size = size
+        self.path = path.join('fonts', self.name)
+        self.font = pg.font.Font(self.path, self.size)
 
 
 class Color:
@@ -28,5 +40,14 @@ class Color:
     BROWN = (200, 100, 0)
 
 
-class Text:
-    """ Stores game text messages as static variables """
+class Key:
+
+    w = 119
+    a = 97
+    s = 115
+    d = 100
+
+    arrow_up = 1073741906
+    arrow_down = 1073741905
+
+    enter = 13
