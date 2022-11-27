@@ -17,17 +17,13 @@ def rotated(vec: np.ndarray, angle: float):
     return vec
 
 
-def draw_floor(screen):
-    color = Color.BROWN
-    pg.draw.rect(screen, color, [0, HEIGHT/2, WIDTH, HEIGHT/2])
-
-
 class Camera:
-    move_keys = {119: 0.0, 97: -np.pi / 2,
-                 115: np.pi, 100: np.pi / 2}
+    move_keys = {Key.w: 0.0, Key.a: -np.pi / 2,
+                 Key.s: np.pi, Key.d: np.pi / 2}
 
-    def __init__(self, r_0: float = 500.0, l_0: float = 500.0, height: float = 100.0, pos: np.ndarray[int] = CENTER,
-                 velocity: float = 10.0, view_vector: np.ndarray = np.array([1.0, 0.0])):
+    def __init__(self, r_0: float = 500.0, l_0: float = 500.0, height: float = 100.0,
+                 pos: np.ndarray[int] = np.array([0, 0]), velocity: float = 10.0,
+                 view_vector: np.ndarray = np.array([1.0, 0.0])):
         self.r_0 = r_0
         self.l_0 = l_0
         self.height = height
@@ -36,12 +32,17 @@ class Camera:
         self.view_vec = view_vector
         self.screen_vec = rotated(self.view_vec, np.pi / 2)
         self.angle_of_vision = np.arctan(self.l_0 / self.r_0)
+        self.motion_direction = {key: 0 for key in Camera.move_keys.keys()}
 
-    def move(self, motion_direction):
+    def move(self):
         # TODO: make collisions with objects
-        for i in motion_direction.keys():
-            if motion_direction[i] == 1:
-                self.pos += self.velocity * rotated(self.view_vec, Camera.move_keys[i])
+        # TODO: change motion direction
+        for i in self.motion_direction.keys():
+            if self.motion_direction[i] == 1:
+                print(type(self.pos[0]))
+                self.pos += np.array(
+                    list(map(lambda x: int(x),
+                             (self.velocity * rotated(self.view_vec, Camera.move_keys[i])).round())))
 
     def rotate(self):
         angle_velocity = 0.001
@@ -49,10 +50,25 @@ class Camera:
         pg.mouse.set_pos(CENTER)
         self.screen_vec = rotated(self.view_vec, np.pi / 2)
 
+    def update(self, motion_direction):
+        self.motion_direction = motion_direction
+        self.move()
+        self.rotate()
 
-class Stick:
+
+class Object:
+
+    def __init__(self):
+        pass
+
+    def update(self):
+        pass
+
+
+class Stick(Object):
 
     def __init__(self, screen: pg.Surface, camera: Camera, pos: np.ndarray[int], z: list):
+        super().__init__()
         self.screen = screen
         self.camera = camera
         self.pos = pos
@@ -79,9 +95,10 @@ class Stick:
             pg.draw.line(self.screen, color, line_down, line_up, line_width)
 
 
-class Wall:
+class Wall(Object):
 
     def __init__(self, pos: np.ndarray, vec: np.ndarray, z: list, width: float):
+        super().__init__()
         self.pos = pos
         self.vec = vec
         self.z = z
@@ -95,20 +112,3 @@ class Wall:
             sticks.append(stick)
 
         return sticks
-
-
-def get_sticks_from_objects(objects: list, screen: pg.Surface, camera: Camera):
-    sticks = []
-    for obj in objects:
-        sticks += obj.sticks(screen, camera)
-    return sticks
-
-
-def draw(objects: list, screen: pg.Surface, camera: Camera):
-    screen.fill(Color.WHITE)
-    draw_floor(screen)
-    sticks = get_sticks_from_objects(objects, screen, camera)
-    sticks = list(filter(lambda x: abs(x.angle) <= camera.angle_of_vision, sticks))
-    sticks = sorted(sticks, key=lambda x: x.r, reverse=True)
-    for stick in sticks:
-        stick.draw_3d()
