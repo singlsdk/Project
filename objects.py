@@ -21,7 +21,7 @@ class Camera:
     move_keys = {Key.w: 0.0, Key.a: -np.pi / 2,
                  Key.s: np.pi, Key.d: np.pi / 2}
 
-    def __init__(self, r_0: float = 500.0, l_0: float = 500.0, height: float = 100.0,
+    def __init__(self, r_0: float = 1000.0, l_0: float = 1000.0, height: float = 100.0,
                  pos: np.ndarray[int] = np.array([0, 0]), velocity: float = 10.0,
                  view_vector: np.ndarray = np.array([1.0, 0.0])):
         self.r_0 = r_0
@@ -39,7 +39,6 @@ class Camera:
         # TODO: change motion direction
         for i in self.motion_direction.keys():
             if self.motion_direction[i] == 1:
-                print(type(self.pos[0]))
                 self.pos += np.array(
                     list(map(lambda x: int(x),
                              (self.velocity * rotated(self.view_vec, Camera.move_keys[i])).round())))
@@ -67,12 +66,13 @@ class Object:
 
 class Stick(Object):
 
-    def __init__(self, screen: pg.Surface, camera: Camera, pos: np.ndarray[int], z: list):
+    def __init__(self, screen: pg.Surface, camera: Camera, pos: np.ndarray[int], z: list, color):
         super().__init__()
         self.screen = screen
         self.camera = camera
         self.pos = pos
         self.z = z  # z[0] is bottom point and z[1] is top point
+        self.color = color
 
         l_vec = self.pos - self.camera.pos
         self.r = np.dot(l_vec, self.camera.view_vec)
@@ -90,25 +90,49 @@ class Stick(Object):
             h_up = self.z[1] - self.camera.height
             line_down = CENTER + np.array([self.t, - h_down * self.k])
             line_up = CENTER + np.array([self.t, - h_up * self.k])
-            color = Color.GREEN
-            line_width = 1
+            color = self.color
+            line_width = int(2*self.camera.r_0 / self.r)
             pg.draw.line(self.screen, color, line_down, line_up, line_width)
 
 
 class Wall(Object):
 
-    def __init__(self, pos: np.ndarray, vec: np.ndarray, z: list, width: float):
+    def __init__(self, pos: np.ndarray, vec: np.ndarray, z: list, width: float, color):
         super().__init__()
         self.pos = pos
         self.vec = vec
         self.z = z
         self.width = width
+        self.color = color
 
     def sticks(self, screen, camera):
-        lines_n = 1000
+        lines_n = 500
         sticks = []
         for pos in np.linspace(self.pos, self.pos + self.width * self.vec, lines_n):
-            stick = Stick(screen, camera, np.array(list(map(lambda x: int(x), pos.round()))), self.z)
+            stick = Stick(screen, camera, np.array(list(map(lambda x: int(x), pos.round()))), self.z, self.color)
+            sticks.append(stick)
+
+        return sticks
+
+
+class Circle(Object):
+
+    def __init__(self, pos: np.ndarray, vec: np.ndarray, z_of_center: float, radius: float, color):
+        super().__init__()
+        self.pos = pos
+        self.vec = vec
+        self.z_of_center = z_of_center
+        self.radius = radius
+        self.color = color
+
+    def sticks(self, screen, camera):
+        lines_n = 500
+        sticks = []
+        for pos in np.linspace(self.pos - self.radius * self.vec, self.pos + self.radius * self.vec, lines_n):
+            z = (self.radius**2 - np.linalg.norm(pos - self.pos)**2)**0.5
+            stick = Stick(screen, camera,
+                          np.array(list(map(lambda x: int(x), pos.round()))),
+                          [self.z_of_center - z, self.z_of_center + z], self.color)
             sticks.append(stick)
 
         return sticks

@@ -39,7 +39,3 @@ class Level:
         sticks = sorted(sticks, key=lambda x: x.r, reverse=True)
         for stick in sticks:
             stick.draw_3d()
-
-
-objects_1 = [Wall(np.array([100, 0]), np.array([0.0, 1.0]), [0.0, 200.0], 100)]
-LEVEL_1 = Level(objects_1)
