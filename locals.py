@@ -9,7 +9,7 @@ Defines global scope constants
 """
 
 # Refresh rate
-FPS = 30
+FPS = 60
 
 # Screen resolution
 WIDTH, HEIGHT = 1500, 750

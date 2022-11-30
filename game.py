@@ -11,7 +11,7 @@ from menu import *
 class Game:
     STATES = ['MainMenu', '3D', '2D']
 
-    def __init__(self, screen):
+    def __init__(self, screen: pg.Surface):
         self.state = 'MainMenu'
         self.objects = []
         self.screen = screen
@@ -21,12 +21,14 @@ class Game:
     def update(self):
 
         if self.state == 'MainMenu':
+            pg.mouse.set_visible(True)
             self.main_menu.update()
             self.main_menu.draw()
 
         if self.state == '3D':
+            pg.mouse.set_visible(False)
             self.level.update()
-            self.level.draw(self.screen, self.level.camera)
+            self.level.draw(self.screen)
 
     def events(self, event):
         if self.state == 'MainMenu':
