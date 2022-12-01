@@ -2,8 +2,6 @@ import numpy as np
 from os import path
 import pygame as pg
 
-# TODO: make font class
-
 """
 Defines global scope constants
 """
@@ -16,14 +14,13 @@ WIDTH, HEIGHT = 1500, 750
 CENTER = np.array([WIDTH/2, HEIGHT/2])
 
 
-class Font:
-    pg.font.init()
+def get_path(name):
+    return path.join('fonts', name)
 
-    def __init__(self, name, size):
-        self.name = name
-        self.size = size
-        self.path = path.join('fonts', self.name)
-        self.font = pg.font.Font(self.path, self.size)
+
+class Font:
+
+    GOTHIC = get_path('OldLondon.ttf')
 
 
 class Color:
@@ -51,3 +48,4 @@ class Key:
     arrow_down = 1073741905
 
     enter = 13
+    esc = 27

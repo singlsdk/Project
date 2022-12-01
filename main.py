@@ -3,9 +3,10 @@ from objects import *
 from locals import *
 from game import *
 
-# TODO: change imports in all files (remove *)
-# TODO: rename classes and vars to avoid difference only in letter cases
-# TODO: remove screen and camera from args
+# TODO: refactoring
+#   TODO: change imports in all files (remove *)
+#   TODO: rename classes and vars to avoid difference only in letter cases
+#   TODO: remove screen and camera from args
 
 
 def main():

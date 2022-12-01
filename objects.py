@@ -2,10 +2,10 @@ import pygame as pg
 from locals import *
 from sprites import *
 
-# TODO: remove screen, camera from args
 # TODO: fix 3D color
 # TODO: fix gaps in walls
 # TODO: make collisions
+# TODO: calculate number of sticks
 
 
 def rotated(vec: np.ndarray, angle: float):

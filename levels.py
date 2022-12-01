@@ -14,10 +14,14 @@ class Level:
         self.motion_direction = {key: 0 for key in Camera.move_keys.keys()}
         self.drawable_objects = []
 
-    def event(self, event):
+    def event(self, game, event):
         if event.type == pg.KEYDOWN:
             if event.key in Camera.move_keys.keys():
                 self.motion_direction[event.key] = 1
+
+            if event.key in [Key.esc]:
+                game.state = 'PauseMenu'
+
         if event.type == pg.KEYUP:
             self.motion_direction = {key: 0 for key in Camera.move_keys.keys()}
 

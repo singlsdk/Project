@@ -1,54 +1,54 @@
 from locals import *
-from buttons import Button
+from buttons import MenuButton
+from levels import *
 
 
 class Menu:
 
-    def __init__(self, screen):
+    def __init__(self, screen, title_text, buttons_text, font_of_title, font_of_text, bigger_font_of_text):
         self.screen = screen
         self.chosen_button_number = 0
 
-        self.title_text = None
-        self.buttons_text = None
+        self.title_text = title_text
+        self.buttons_text = buttons_text
 
-        self.title = self.get_title()
+        self.font_of_title = font_of_title
+        self.font_of_text = font_of_text
+        self.bigger_font_of_text = bigger_font_of_text
+
+        self.title = MenuButton(self.screen, [WIDTH / 2, 100], self.font_of_title, self.title_text)
         self.buttons = []
-        self.chosen_button = None
-        # self.update()
+        self.chosen_button_number = 0
+        self.create_buttons()
 
-    def get_title(self):
-        font_name = "OldLondon.ttf"
-        font_size = 50
-        font = Font(font_name, font_size).font
-        return Button(self.screen, [WIDTH / 2, 100], font, self.title_text)
+    def get_deviation_from_center(self, button_number):
+        return np.array([0, -100 + button_number * (2 * self.font_of_text.get_height())])
+
+    def create_buttons(self):
+        self.buttons = []
+        for button_number in range(len(self.buttons_text)):
+            deviation_from_center = self.get_deviation_from_center(button_number)
+            button = MenuButton(self.screen, CENTER + deviation_from_center,
+                                self.font_of_text, self.buttons_text[button_number], button_number)
+
+            self.buttons.append(button)
 
     def update(self):
-
-        self.buttons = []
-        font_name = "OldLondon.ttf"
-        font_size = 50
-        font_main = Font(font_name, font_size).font
-        font_bigger = Font(font_name, int(font_size * 1.5)).font
-        for button_number in range(len(self.buttons_text)):
-            deviation_from_center = np.array([0, -100 + button_number * (1.5 * font_size)])
-            if button_number != self.chosen_button_number:
-                self.buttons.append(Button(self.screen, CENTER + deviation_from_center,
-                                           font_main, self.buttons_text[button_number]))
+        self.draw_arrow()
+        for i in range(len(self.buttons_text)):
+            if self.buttons[i].number == self.chosen_button_number:
+                self.buttons[i].font = self.bigger_font_of_text
             else:
-                self.chosen_button = Button(self.screen, CENTER + deviation_from_center,
-                                            font_bigger, self.buttons_text[button_number])
-                self.buttons.append(self.chosen_button)
+                self.buttons[i].font = self.font_of_text
 
     def draw_arrow(self):
-        font_name = "OldLondon.ttf"
-        font_size = 50
-        font = Font(font_name, font_size).font
         deviation_from_text = 50
-        right_position = [self.chosen_button.text_rect.left - deviation_from_text, self.chosen_button.center[1]]
-        arrow_left = Button(self.screen, right_position, font, '<')
+        chosen_button = self.buttons[self.chosen_button_number]
+        right_position = [chosen_button.text_rect.left - deviation_from_text, chosen_button.center[1]]
+        arrow_left = MenuButton(self.screen, right_position, self.bigger_font_of_text, '<')
         arrow_left.draw()
-        left_position = [self.chosen_button.text_rect.right + deviation_from_text, self.chosen_button.center[1]]
-        arrow_right = Button(self.screen, left_position, font, '<')
+        left_position = [chosen_button.text_rect.right + deviation_from_text, chosen_button.center[1]]
+        arrow_right = MenuButton(self.screen, left_position, self.bigger_font_of_text, '<')
         arrow_right.draw()
 
     def draw(self):
@@ -58,15 +58,81 @@ class Menu:
         self.title.draw()
         self.draw_arrow()
 
+    def choose_button_by_mouse(self):
+        for button in self.buttons:
+            if button.is_mouse_on():
+                self.chosen_button_number = button.number
+
+    def press_button(self, game):
+        pass
+
+    def event(self, game, event):
+        if event.type == pg.KEYDOWN:
+            direction = 0
+            if event.key in [Key.w, Key.arrow_up]:
+                direction = -1
+            if event.key in [Key.s, Key.arrow_down]:
+                direction = 1
+
+            self.chosen_button_number = \
+                (self.chosen_button_number + direction) % len(MainMenu.BUTTONS)
+
+            if event.key in [Key.enter]:
+                self.press_button(game)
+
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                for button in self.buttons:
+                    if button.is_mouse_on():
+                        self.press_button(game)
+
+        if event.type == pg.MOUSEMOTION:
+            self.choose_button_by_mouse()
+
 
 class MainMenu(Menu):
     TITLE = 'Name of the Game'
     NEW_GAME = 'New Game'
     QUIT = 'Quit'
+
+    FONT_OF_TITLE = pg.font.Font(Font.GOTHIC, 90)
+    FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 60)
+    BIGGER_FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 75)
+
     BUTTONS = [NEW_GAME, QUIT]
 
     def __init__(self, screen):
-        super().__init__(screen)
-        self.title_text = MainMenu.TITLE
-        self.title = self.get_title()
-        self.buttons_text = MainMenu.BUTTONS
+        super().__init__(screen, MainMenu.TITLE, MainMenu.BUTTONS,
+                         MainMenu.FONT_OF_TITLE, MainMenu.FONT_OF_TEXT, MainMenu.BIGGER_FONT_OF_TEXT)
+
+    def press_button(self, game):
+        button_text = self.buttons[self.chosen_button_number].inbox_text
+        if button_text == MainMenu.NEW_GAME:
+            game.level = LEVEL_1
+            game.state = '3D'
+        if button_text == MainMenu.QUIT:
+            game.finished = 1
+
+
+class PauseMenu(Menu):
+    TITLE = 'Game Paused'
+    CONTINUE = 'Continue'
+    MENU = 'Go To Menu'
+
+    FONT_OF_TITLE = pg.font.Font(Font.GOTHIC, 90)
+    FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 60)
+    BIGGER_FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 75)
+
+    BUTTONS = [CONTINUE, MENU]
+
+    def __init__(self, screen):
+        super().__init__(screen, PauseMenu.TITLE, PauseMenu.BUTTONS,
+                         PauseMenu.FONT_OF_TITLE, PauseMenu.FONT_OF_TEXT, PauseMenu.BIGGER_FONT_OF_TEXT)
+
+    def press_button(self, game):
+        button_text = self.buttons[self.chosen_button_number].inbox_text
+        if button_text == PauseMenu.CONTINUE:
+            game.state = '3D'
+        if button_text == PauseMenu.MENU:
+            game.main_menu.chosen_button_number = 0
+            game.state = 'MainMenu'
