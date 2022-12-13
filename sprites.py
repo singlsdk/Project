@@ -16,7 +16,7 @@ def get_sprite_set(file_name, height=100):
 
     pth = path.join('sprites', file_name)
 
-    sheet = pg.image.load(pth)
+    sheet = pg.image.load(pth).convert()
 
     sprite_set = {}
 

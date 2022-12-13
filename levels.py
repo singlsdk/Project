@@ -11,24 +11,18 @@ class Level:
     def __init__(self, objects):
         self.camera = Camera()
         self.objects = objects
-        self.motion_direction = {key: 0 for key in Camera.move_keys.keys()}
         self.drawable_objects = []
 
-    def event(self, game, event):
+    @staticmethod
+    def event(game, event):
         if event.type == pg.KEYDOWN:
-            if event.key in Camera.move_keys.keys():
-                self.motion_direction[event.key] = 1
-
             if event.key in [Key.esc]:
                 game.state = 'PauseMenu'
 
-        if event.type == pg.KEYUP:
-            self.motion_direction = {key: 0 for key in Camera.move_keys.keys()}
-
     def update(self):
-        self.camera.update(self.motion_direction)
+        self.camera.update(self.objects)
         for obj in self.objects:
-            obj.update()
+            obj.update(self.camera)
 
     def get_sticks_from_objects(self, screen):
         sticks = []
@@ -50,7 +44,8 @@ class Level:
             obj.get_parameters(self.camera)
 
         draw_distance = 2000
-        self.drawable_objects = list(filter(lambda x: draw_distance > x.r > 0, self.drawable_objects))
+        self.drawable_objects = list(filter(lambda x: draw_distance > x.r > DrawableObject.MINIMAL_DRAWING_DISTANCE,
+                                            self.drawable_objects))
         self.drawable_objects = sorted(self.drawable_objects, key=lambda x: x.r, reverse=True)
         for drawable_obj in self.drawable_objects:
             drawable_obj.draw(screen, self.camera)
@@ -67,4 +62,6 @@ objects_1 = [Wall(np.array([100, 100]), np.array([0.0, 1.0]), [0.0, 200.0], 300,
              Sprite(np.array([600, 0]), 100, 'skull.png', np.array([-1, 0]), 100),
              Sprite(np.array([0, 600]), 100, 'cacodemon.png', np.array([0, -1]), 100)
              ]
+
+# objects_1 = [Sprite(np.array([0, 600]), 100, 'cacodemon.png', np.array([0, -1]), 100)]
 LEVEL_1 = Level(objects_1)
