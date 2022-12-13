@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 from random import choice, randrange, randint
 
+from locals import Color
 from objects import Wall
 
 # Алгоритм "Recursive Backtracker"
@@ -77,13 +78,13 @@ def get_walls(grid_cells):
     walls = []
     for cell in grid_cells:
         if cell.walls['top']:
-            walls.append(Wall(np.array([cell.x , cell.y]), np.array([1, 0]), TILE * 10, (0, 255, 0)))
+            walls.append(Wall(np.array([cell.x , cell.y]), np.array([1, 0]), TILE * 4, TILE * 10, Color.GREEN))
         elif cell.walls['bottom']:
-            walls.append(Wall(np.array([cell.x, cell.y + 1]), np.array([1, 0]), TILE * 10, (0, 255, 0)))
+            walls.append(Wall(np.array([cell.x, cell.y + 1]), np.array([1, 0]), TILE * 4, TILE * 10, Color.GREEN))
         elif cell.walls['right']:
-            walls.append(Wall(np.array([cell.x + 1, cell.y]), np.array([0, 1]), TILE * 10, (0, 255, 0)))
+            walls.append(Wall(np.array([cell.x + 1, cell.y]), np.array([0, 1]), TILE * 4, TILE * 10, Color.GREEN))
         elif cell.walls['left']:
-            walls.append(Wall(np.array([cell.x, cell.y]), np.array([0, 1]), TILE * 10, (0, 255, 0)))
+            walls.append(Wall(np.array([cell.x, cell.y]), np.array([0, 1]), TILE * 4, TILE * 10, Color.GREEN))
 
     return walls
 

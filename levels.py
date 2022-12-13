@@ -1,3 +1,4 @@
+from maze_generator import generate_maze, get_walls
 from objects import *
 
 
@@ -55,16 +56,6 @@ class Level:
         for drawable_obj in self.drawable_objects:
             drawable_obj.draw(screen, self.camera)
 
-
-objects_1 = [Wall(np.array([100, 100]), np.array([0.0, 1.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([100, 100]), np.array([1.0, 0.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([-100, 100]), np.array([0.0, 1.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([-100, 100]), np.array([-1.0, 0.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([100, -100]), np.array([0.0, -1.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([100, -100]), np.array([1.0, 0.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([-100, -100]), np.array([0.0, -1.0]), [0.0, 200.0], 300, Color.GREEN),
-             Wall(np.array([-100, -100]), np.array([-1.0, 0.0]), [0.0, 200.0], 300, Color.GREEN),
-             Sprite(np.array([600, 0]), 100, 'skull.png', np.array([-1, 0]), 100),
-             Sprite(np.array([0, 600]), 100, 'cacodemon.png', np.array([0, -1]), 100)
-             ]
+maze = generate_maze()
+objects_1 = get_walls(maze)
 LEVEL_1 = Level(objects_1)
