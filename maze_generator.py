@@ -74,6 +74,7 @@ class Cell:
             neighbors.append(left)
         return choice(neighbors) if neighbors else False
 
+#Fixed
 def get_walls(grid_cells):
     walls = []
     for cell in grid_cells:
