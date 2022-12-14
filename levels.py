@@ -58,4 +58,7 @@ class Level:
 
 maze = generate_maze()
 objects_1 = get_walls(maze)
+print(len(objects_1))
+for wall in objects_1:
+    print(wall.pos, wall.pos + wall.vec * wall.width, wall.z)
 LEVEL_1 = Level(objects_1)

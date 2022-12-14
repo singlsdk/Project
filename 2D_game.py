@@ -212,10 +212,10 @@ while True:
     dark_image_right = pygame.transform.scale(dark_img, (WIDTH, HEIGHT))
     dark_image_bottom = pygame.transform.scale(dark_img, (WIDTH, HEIGHT))
 
-    game_surface.blit(dark_img_top, (0, 0))
-    game_surface.blit(dark_img_left, (0, 0))
-    game_surface.blit(dark_image_right, (player_rect.topright[0] + 50, 0))
-    game_surface.blit(dark_image_right, (0, player_rect.bottomright[1] + 30))
+    #game_surface.blit(dark_img_top, (0, 0))
+    #game_surface.blit(dark_img_left, (0, 0))
+    #game_surface.blit(dark_image_right, (player_rect.topright[0] + 50, 0))
+    #game_surface.blit(dark_image_right, (0, player_rect.bottomright[1] + 30))
 
     if (flag_space != 1):
         game_surface.blit(player_img, player_rect)

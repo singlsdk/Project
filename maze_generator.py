@@ -15,7 +15,7 @@ from objects import Wall
 # Алгоритм "Recursive Backtracker"
 
 #Задаем размеры окна и размер одной клетки
-RES = WIDTH, HEIGHT = 1202, 902
+RES = WIDTH, HEIGHT = 602, 402
 TILE = 50
 cols, rows = WIDTH // TILE, HEIGHT // TILE
 
@@ -78,14 +78,13 @@ def get_walls(grid_cells):
     walls = []
     for cell in grid_cells:
         if cell.walls['top']:
-            walls.append(Wall(np.array([cell.x , cell.y]), np.array([1, 0]), TILE * 4, TILE * 10, Color.GREEN))
-        elif cell.walls['bottom']:
-            walls.append(Wall(np.array([cell.x, cell.y + 1]), np.array([1, 0]), TILE * 4, TILE * 10, Color.GREEN))
-        elif cell.walls['right']:
-            walls.append(Wall(np.array([cell.x + 1, cell.y]), np.array([0, 1]), TILE * 4, TILE * 10, Color.GREEN))
-        elif cell.walls['left']:
-            walls.append(Wall(np.array([cell.x, cell.y]), np.array([0, 1]), TILE * 4, TILE * 10, Color.GREEN))
-
+            walls.append(Wall(np.array([cell.x * TILE, cell.y * TILE]), np.array([1, 0]), [0, TILE], TILE, Color.GREEN))
+        if cell.walls['bottom']:
+            walls.append(Wall(np.array([cell.x * TILE, (cell.y + 1) * TILE]), np.array([1, 0]), [0, TILE], TILE, Color.GREEN))
+        if cell.walls['right']:
+            walls.append(Wall(np.array([(cell.x + 1) * TILE, cell.y * TILE]), np.array([0, 1]), [0, TILE], TILE , Color.GREEN))
+        if cell.walls['left']:
+            walls.append(Wall(np.array([cell.x * TILE, cell.y * TILE]), np.array([0, 1]), [0, TILE], TILE, Color.GREEN))
     return walls
 
 
