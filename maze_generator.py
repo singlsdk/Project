@@ -15,7 +15,7 @@ from objects import Wall
 # Алгоритм "Recursive Backtracker"
 
 #Задаем размеры окна и размер одной клетки
-RES = WIDTH, HEIGHT = 602, 402
+RES = WIDTH, HEIGHT = 602, 302
 TILE = 50
 cols, rows = WIDTH // TILE, HEIGHT // TILE
 

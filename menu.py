@@ -93,6 +93,7 @@ class Menu:
 class MainMenu(Menu):
     TITLE = 'Name of the Game'
     NEW_GAME = 'New Game'
+    NEW_GAME_2D = 'New Game 2D'
     QUIT = 'Quit'
 
     FONT_OF_TITLE = pg.font.Font(Font.GOTHIC, 90)
