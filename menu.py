@@ -164,11 +164,11 @@ class D2menu(Menu):
             button_text = self.buttons[self.chosen_button_number].inbox_text
             if button_text == D2menu.EASY:
                 game.state = 'Easy'
-                print("Как же заебал этот баг")
+                print("Easy")
             if button_text == D2menu.MEDIUM:
-                print("А этот еще не успел")
+                print("Medium")
             if button_text == D2menu.HARD:
-                print("Жопа")
+                print("Hard")
 
 class GameOverMenu(Menu):
     TITLE = 'Game Over'
