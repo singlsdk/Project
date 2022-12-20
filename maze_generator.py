@@ -5,19 +5,126 @@ from random import choice, randrange, randint
 from locals import Color
 from objects import Wall
 
+global RES
+global HEIGHT, WIDTH
+global TILE
+TILE = 50
+global right_indent, bottom_indent
+global cup_score, game_start
+game_start = 0
+global cols, rows
+global player_health
+
 # Алгоритм "Recursive Backtracker"
 
 #Задаем размеры окна и размер одной клетки
-#TILE = 70
-#RES = WIDTH, HEIGHT = randint(9, 13) * TILE + 2, randint(7, 11) * TILE + 2#1202, 902
+#RES = WIDTH, HEIGHT = 1002, 502#RES[0], RES[1]
+#TILE = 50
 #cols, rows = WIDTH // TILE, HEIGHT // TILE
 
-# Алгоритм "Recursive Backtracker"
+def set_easy():
+    global RES
+    RES = [1002, 502]
+    global WIDTH
+    WIDTH = 1002
+    global HEIGHT
+    HEIGHT = 502
+    global cols
+    cols = WIDTH // TILE
+    global rows
+    rows = HEIGHT // TILE
+    global right_indent
+    right_indent = 50
+    global bottom_indent
+    bottom_indent = 30
+    global cup_score
+    cup_score = 3
+    global game_start
+    game_start = 1
+    global player_health
+    player_health = 3
 
-#Задаем размеры окна и размер одной клетки
-RES = WIDTH, HEIGHT = 1002, 502
-TILE = 50
-cols, rows = WIDTH // TILE, HEIGHT // TILE
+def set_medium():
+    global RES
+    RES = [1302, 702]
+    global WIDTH
+    WIDTH = 1302
+    global HEIGHT
+    HEIGHT = 702
+    global cols
+    cols = WIDTH // TILE
+    global rows
+    rows = HEIGHT // TILE
+    global right_indent
+    right_indent = 50
+    global bottom_indent
+    bottom_indent = 30
+    global cup_score
+    cup_score = 3
+    global game_start
+    game_start = 1
+    global player_health
+    player_health = 2
+
+def set_hard():
+    global RES
+    RES = [1402, 802]
+    global WIDTH
+    WIDTH = 1402
+    global HEIGHT
+    HEIGHT = 802
+    global cols
+    cols = WIDTH // TILE
+    global rows
+    rows = HEIGHT // TILE
+    global right_indent
+    right_indent = 50
+    global bottom_indent
+    bottom_indent = 30
+    global cup_score
+    cup_score = 3
+    global game_start
+    game_start = 1
+    global player_health
+    player_health = 1
+
+def get_complexity():
+    if WIDTH == 1402:
+        return 'Hard'
+    elif WIDTH == 1302:
+        return 'Medium'
+    elif WIDTH == 1002:
+        return 'Easy'
+def get_res():
+    return RES
+
+def get_right_indent():
+    return right_indent
+
+def get_bottom_indent():
+    return bottom_indent
+
+def get_player_health():
+    return player_health
+
+def damage_player():
+    global player_health
+    player_health -= 1
+
+def get_cols():
+    return cols
+
+def get_rows():
+    return rows
+
+def get_width():
+    return WIDTH
+
+def get_height():
+    return HEIGHT
+
+def get_cup_score():
+    return cup_score
 
 class Cell:
     def __init__(self, x, y):

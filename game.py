@@ -51,7 +51,7 @@ class Game:
         if self.state == 'Easy':
             if self.flag != 1:
                 pg.mouse.set_visible(False)
-                subprocess.call("dgame.py", shell=True)
+                subprocess.call("lolfunc.py", shell=True)
                 self.flag = 1
 
         #if self.state == 'Medium':
