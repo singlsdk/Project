@@ -10,7 +10,7 @@ def draw_floor(screen):
 class Level:
 
     def __init__(self, objects):
-        self.camera = Camera()
+        self.camera = Camera(pos=np.array([200, 200]))
         self.objects = objects
         self.motion_direction = {key: 0 for key in Camera.move_keys.keys()}
         self.drawable_objects = []
@@ -50,7 +50,7 @@ class Level:
         for obj in self.drawable_objects:
             obj.get_parameters(self.camera)
 
-        draw_distance = 2000
+        draw_distance = 500
         self.drawable_objects = list(filter(lambda x: draw_distance > x.r > 0, self.drawable_objects))
         self.drawable_objects = sorted(self.drawable_objects, key=lambda x: x.r, reverse=True)
         for drawable_obj in self.drawable_objects:

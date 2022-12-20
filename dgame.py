@@ -1,39 +1,8 @@
 import pygame
 from pygame import *
+import math
 
 from maze_generator import *
-
-#ARIAL_50 = pygame.font.SysFont('arial', 50)
-
-#class Menu:
-    #def __init__(self):
-        #self._option_surfaces = []
-        #self._callbacks = []
-        #self._current_option_index = 0
-
-    #def append_option(self, option, callback):
-        #self._option_surfaces.append(ARIAL_50.render(option, True, (255, 255, 255)))
-        #self._callbacks.append(callback)
-
-    #def switch(self, direction):
-        # Не сможем выйти за рамки массива
-        #self._current_option_index = max(0, min(self._current_option_index + direction, len(self._option_surfaces) - 1))
-
-    #def select(self):
-        #self._callbacks[self._current_option_index]()
-
-    #def draw(self, surf, x, y, option_y_padding):
-        #for i, option in enumerate(self._option_surfaces):
-            #option_rect = option.get_rect()
-            #option_rect.topleft = {x, y + i * option_y_padding}
-            #if i == self._current_option_index:
-                #draw.rect(surf, (0, 100, 0), option_rect)
-            #surf.blit(option, option_rect)
-
-#menu = Menu()
-#menu.append_option('Easy', lambda: print("Easy"))
-#menu.append_option('Medium', lambda: print("Medium"))
-#menu.append_option('Hard', lambda: print("Hard"))
 
 # Здесь будет класс вещей, которые нужно получить
 class Object:
@@ -41,7 +10,6 @@ class Object:
     #Вызов метода размещения картинки
     def __init__(self, type):
         self.type = type
-        #self.img = pygame.image.load('img/trophy_.png')
         if type == 'key':
             self.img = pygame.image.load('img/object_key.png').convert_alpha()
         elif type == 'cup':
@@ -52,13 +20,9 @@ class Object:
             self.img = pygame.image.load('img/object_broken_bush.png').convert_alpha()
         elif type == 'abyss':
             self.img = pygame.image.load('img/abyss.png').convert()
-        #self.img = pygame.image.load('img/object_key.png').convert_alpha()
         self.img = pygame.transform.scale(self.img, (TILE - 10, TILE - 10))
         self.rect = self.img.get_rect()
         self.set_pos()
-
-    #def set_current_pos(self, x, y):
-        #self.rect.topleft = x, y
 
     def broke_bush(self, x, y):
         self.type = 'broken_bush'
@@ -83,16 +47,17 @@ def is_collide(x, y):
     return True
 
 # Метод, проверяющий использование трофея и создающий новый трофей
-def use_object():
+def use_object(jump_flag):
     if (score > cup_score):
         event.type = pygame.QUIT
         #gameover
     for object in object_list:
         if player_rect.collidepoint(object.rect.center):
-            if object.type == 'bush':
+            if object.type == 'bush' and jump_flag == 0:
                 x = object.rect.topleft[0]
                 y = object.rect.topleft[1]
                 object.broke_bush(x, y)
+                print("Куст сломан")
                 return 'bush'
             elif object.type == 'abyss':
                 return 'abyss'
@@ -129,7 +94,7 @@ def set_record(record, score):
         f.write(str(rec))
 
 
-FPS = 40
+FPS = 50
 pygame.init()
 game_surface = pygame.Surface(RES)
 surface = pygame.display.set_mode((WIDTH + 300, HEIGHT))
@@ -151,8 +116,8 @@ maze = generate_maze()
 player_speed = 4
 player_health = 2
 
-player_img = pygame.image.load('img/player1.png').convert_alpha()
-player_img = pygame.transform.scale(player_img, (TILE - 2 * maze[0].thickness, TILE - 2 * maze[0].thickness))
+player_img = pygame.image.load('img/player.png').convert_alpha()
+player_img = pygame.transform.scale(player_img, ((TILE - 2 * maze[0].thickness) + 1, (TILE - 2 * maze[0].thickness) + 1))
 
 player_jump_left_img = pygame.image.load('img/player-jump-left.png').convert_alpha()
 player_jump_left_img = pygame.transform.scale(player_jump_left_img, (TILE - 2 * maze[0].thickness, TILE - 2 * maze[0].thickness))
@@ -185,6 +150,9 @@ player_move_bottom0_img = pygame.transform.scale(player_move_bottom0_img, (TILE 
 player_move_bottom1_img = pygame.image.load('img/player-move-bottom1.png').convert_alpha()
 player_move_bottom1_img = pygame.transform.scale(player_move_bottom1_img, (TILE - 2 * maze[0].thickness, TILE - 2 * maze[0].thickness))
 
+#player_turn0_img = pygame.image.load('img/player-turn0.png').convert_alpha()
+#player_turn0_img = pygame.transform.scale(player_move_bottom0_img, (TILE - 2 * maze[0].thickness, TILE - 2 * maze[0].thickness))
+
 player_rect = player_img.get_rect()
 player_rect.center = TILE // 2, TILE // 2
 
@@ -196,10 +164,15 @@ player_anim_right_count = 0
 player_anim_left_count = 0
 player_anim_jump_count = 0
 player_anim_bottom_count = 0
+player_anim_bottom_count_real = 0
+player_anim_turn_count = 0
 
 walk_right = [player_move_right0_img, player_move_right1_img, player_move_right2_img]
 walk_left = [player_move_left0_img, player_move_left1_img, player_move_left2_img]
 walk_bottom = [player_move_bottom0_img, player_move_bottom1_img]
+
+#turn_left = []
+#turn_right = []
 
 jump_left = [player_jump_left_img, player_jump_left_img, player_jump_left_img, player_jump_left_img, player_jump_left_img,
              player_jump_left_img, player_jump_left_img, player_jump_left_img, player_jump_left_img, player_jump_left_img,
@@ -220,7 +193,7 @@ jump_bottom = [player_jump_bottom_img, player_jump_bottom_img, player_jump_botto
                player_jump_bottom_img, player_jump_bottom_img, player_jump_bottom_img, player_jump_bottom_img, player_jump_bottom_img]
 
 # trophy settings
-object_list = [Object('key'), Object('key'), Object('key'), Object('bush'), Object('abyss'), Object('abyss'), Object('abyss')]
+object_list = [Object('key'), Object('key'), Object('key'), Object('bush'), Object('bush'), Object('abyss')]
 
 # collision list
 walls_collide_list = sum([cell.get_rects() for cell in maze], [])
@@ -249,10 +222,12 @@ while True:
     else:
         player_anim_right_count += 1
 
-    if player_anim_bottom_count >= 1:
-        player_anim_bottom_count = 0
+    if player_anim_bottom_count_real >= 1:
+        player_anim_bottom_count_real = 0
     else:
-        player_anim_bottom_count += 1
+        player_anim_bottom_count_real += 0.15
+
+    player_anim_bottom_count = round(player_anim_bottom_count_real)
 
     if player_anim_left_count >= 2:
         player_anim_left_count = 0
@@ -278,21 +253,18 @@ while True:
     # draw maze
     [cell.draw(game_surface) for cell in maze]
 
-
-    # gameplay
-    if use_object() == 'key':
+    if use_object(jump_flag) == 'bush':
+        FPS -= 5
+        player_health -= 1
+        print(player_health)
+    if use_object(jump_flag) == 'key':
         #print('key')
         FPS += 10
         score += 1
         if (score >= cup_score and flag_cup != 1):
             flag_cup = 1
             object_list = [Object('bush'), Object('abyss'), Object('cup')]
-    if (use_object() == 'bush') and (jump_flag == 0):
-        print('bush')
-        FPS -= 5
-        player_health -= 1
-        print(player_health)
-    if (use_object() == 'abyss') and (jump_flag == 0):
+    if (use_object(jump_flag) == 'abyss') and (jump_flag == 0):
         player_health = 0
         print("You lose")
     game_over()
@@ -319,48 +291,54 @@ while True:
         elif jump_flag == 1 and direction == (player_speed, 0):
             game_surface.blit(jump_right[player_anim_jump_count], player_rect)
         elif jump_flag == 1 and direction == (0, player_speed):
-            game_surface.blit(jump_bottom[player_anim_bottom_count], player_rect)
+            game_surface.blit(jump_bottom[player_anim_jump_count], player_rect)
         elif jump_flag == 1 and direction == (0, -player_speed):
-            game_surface.blit(jump_top[player_anim_bottom_count], player_rect)
+            game_surface.blit(jump_top[player_anim_jump_count], player_rect)
         elif direction == (-player_speed, 0):
-            # print('left', player_anim_left_count)
             game_surface.blit(walk_left[player_anim_left_count], player_rect)
         elif direction == (player_speed, 0):
             game_surface.blit(walk_right[player_anim_right_count], player_rect)
         elif direction == (0, -player_speed):
             game_surface.blit(player_move_top_img, player_rect)
         elif direction == (0, player_speed):
-            # print('bottom', player_anim_left_count)
             game_surface.blit(walk_bottom[player_anim_bottom_count], player_rect)
     elif jump_flag == 1:
         if is_collide(-player_speed, 0):
-            if not is_collide(player_speed, 0) and direction == (player_speed, 0):
+            if (not is_collide(player_speed, 0)) and direction == (player_speed, 0):
                 game_surface.blit(jump_right[player_anim_jump_count], player_rect)
-            if not is_collide(0, player_speed) and direction == (0, player_speed):
-                game_surface.blit(jump_bottom[player_anim_bottom_count], player_rect)
-            if not is_collide(0, -player_speed) and direction == (0, -player_speed):
-                game_surface.blit(jump_top[player_anim_bottom_count], player_rect)
+            if (not is_collide(0, player_speed)) and direction == (0, player_speed):
+                game_surface.blit(jump_bottom[player_anim_jump_count], player_rect)
+            if (not is_collide(0, -player_speed)) and direction == (0, -player_speed):
+                game_surface.blit(jump_top[player_anim_jump_count], player_rect)
+            elif direction == (-player_speed, 0):
+                game_surface.blit(jump_left[player_anim_jump_count], player_rect)
         if is_collide(player_speed, 0):
-            if not is_collide(-player_speed, 0) and direction == (-player_speed, 0):
+            if (not is_collide(-player_speed, 0)) and direction == (-player_speed, 0):
                 game_surface.blit(jump_left[player_anim_jump_count], player_rect)
-            if not is_collide(0, player_speed) and direction == (0, player_speed):
-                game_surface.blit(jump_bottom[player_anim_bottom_count], player_rect)
-            if not is_collide(0, -player_speed) and direction == (0, -player_speed):
-                game_surface.blit(jump_top[player_anim_bottom_count], player_rect)
+            if (not is_collide(0, player_speed)) and direction == (0, player_speed):
+                game_surface.blit(jump_bottom[player_anim_jump_count], player_rect)
+            if (not is_collide(0, -player_speed)) and direction == (0, -player_speed):
+                game_surface.blit(jump_top[player_anim_jump_count], player_rect)
+            elif direction == (player_speed, 0):
+                game_surface.blit(jump_right[player_anim_jump_count], player_rect)
         if is_collide(0, player_speed):
-            if not is_collide(-player_speed, 0) and direction == (-player_speed, 0):
+            if (not is_collide(-player_speed, 0)) and direction == (-player_speed, 0):
                 game_surface.blit(jump_left[player_anim_jump_count], player_rect)
-            if not is_collide(player_speed, 0 ) and direction == (player_speed, 0):
-                game_surface.blit(jump_right[player_anim_bottom_count], player_rect)
-            if not is_collide(0, -player_speed) and direction == (0, -player_speed):
-                game_surface.blit(jump_top[player_anim_bottom_count], player_rect)
+            if (not is_collide(player_speed, 0)) and direction == (player_speed, 0):
+                game_surface.blit(jump_right[player_anim_jump_count], player_rect)
+            if (not is_collide(0, -player_speed)) and direction == (0, -player_speed):
+                game_surface.blit(jump_top[player_anim_jump_count], player_rect)
+            elif direction == (0, player_speed):
+                game_surface.blit(jump_bottom[player_anim_jump_count], player_rect)
         if is_collide(0, -player_speed):
-            if not is_collide(-player_speed, 0) and direction == (-player_speed, 0):
+            if (not is_collide(-player_speed, 0)) and direction == (-player_speed, 0):
                 game_surface.blit(jump_left[player_anim_jump_count], player_rect)
-            if not is_collide(player_speed, 0 ) and direction == (player_speed, 0):
-                game_surface.blit(jump_right[player_anim_bottom_count], player_rect)
-            if not is_collide(0, player_speed) and direction == (0, player_speed):
-                game_surface.blit(jump_bottom[player_anim_bottom_count], player_rect)
+            if (not is_collide(player_speed, 0)) and direction == (player_speed, 0):
+                game_surface.blit(jump_right[player_anim_jump_count], player_rect)
+            if (not is_collide(0, player_speed)) and direction == (0, player_speed):
+                game_surface.blit(jump_bottom[player_anim_jump_count], player_rect)
+            elif direction == (0, -player_speed):
+                game_surface.blit(jump_top[player_anim_jump_count], player_rect)
     else:
         game_surface.blit(player_img, player_rect)
 
@@ -384,21 +362,21 @@ while True:
     dark_image_right = pygame.transform.scale(dark_img, (WIDTH, HEIGHT))
     dark_image_bottom = pygame.transform.scale(dark_img, (WIDTH, HEIGHT))
 
-    #game_surface.blit(dark_img_top, (0, 0))
-    #game_surface.blit(dark_img_left, (0, 0))
-    #game_surface.blit(dark_image_right, (player_rect.topright[0] + 50, 0))
-    #game_surface.blit(dark_image_right, (0, player_rect.bottomright[1] + 30))
+    game_surface.blit(dark_img_top, (0, 0))
+    game_surface.blit(dark_img_left, (0, 0))
+    game_surface.blit(dark_image_right, (player_rect.topright[0] + 50, 0))
+    game_surface.blit(dark_image_right, (0, player_rect.bottomright[1] + 30))
 
     #if (flag_space != 1):
     #game_surface.blit(player_img, player_rect)
 
     # draw stats
-    surface.blit(text_font.render('TIME', True, pygame.Color('cyan'), True), (WIDTH + 70, 30))
-    surface.blit(font.render(f'{time}', True, pygame.Color('cyan')), (WIDTH + 70, 130))
-    surface.blit(text_font.render('score:', True, pygame.Color('forestgreen'), True), (WIDTH + 50, 350))
-    surface.blit(font.render(f'{score}', True, pygame.Color('forestgreen')), (WIDTH + 70, 430))
-    surface.blit(text_font.render('record:', True, pygame.Color('magenta'), True), (WIDTH + 30, 620))
-    surface.blit(font.render(f'{record}', True, pygame.Color('magenta')), (WIDTH + 70, 700))
+    #surface.blit(text_font.render('TIME', True, pygame.Color('cyan'), True), (WIDTH + 70, HEIGHT / 2))
+    surface.blit(font.render(f'{time}', True, pygame.Color('cyan')), (WIDTH + 70, (HEIGHT / 2) - 100))
+    #surface.blit(text_font.render('score:', True, pygame.Color('forestgreen'), True), (WIDTH + 50, 350))
+    #surface.blit(font.render(f'{score}', True, pygame.Color('forestgreen')), (WIDTH + 70, 430))
+    #surface.blit(text_font.render('record:', True, pygame.Color('magenta'), True), (WIDTH + 30, 620))
+    #surface.blit(font.render(f'{record}', True, pygame.Color('magenta')), (WIDTH + 70, 700))
 
     # print(clock.get_fps())
     pygame.display.flip()

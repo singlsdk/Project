@@ -92,7 +92,7 @@ class Menu:
 
 class MainMenu(Menu):
     TITLE = 'Name of the Game'
-    NEW_GAME = 'New Game'
+    NEW_GAME = 'New Game 3D'
     NEW_GAME_2D = 'New Game 2D'
     QUIT = 'Quit'
 
@@ -100,7 +100,7 @@ class MainMenu(Menu):
     FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 60)
     BIGGER_FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 75)
 
-    BUTTONS = [NEW_GAME, QUIT]
+    BUTTONS = [NEW_GAME, NEW_GAME_2D, QUIT]
 
     def __init__(self, screen):
         super().__init__(screen, MainMenu.TITLE, MainMenu.BUTTONS,
@@ -111,6 +111,9 @@ class MainMenu(Menu):
         if button_text == MainMenu.NEW_GAME:
             game.level = LEVEL_1
             game.state = '3D'
+        if button_text == MainMenu.NEW_GAME_2D:
+            game.d2_menu.flag = 0
+            game.state = '2D'
         if button_text == MainMenu.QUIT:
             game.finished = 1
 
@@ -137,3 +140,55 @@ class PauseMenu(Menu):
         if button_text == PauseMenu.MENU:
             game.main_menu.chosen_button_number = 0
             game.state = 'MainMenu'
+
+class D2menu(Menu):
+    TITLE = 'Choose Complexity'
+    EASY = 'Easy'
+    MEDIUM = 'Medium'
+    HARD = 'Hard'
+    flag = 0
+
+    FONT_OF_TITLE = pg.font.Font(Font.GOTHIC, 90)
+    FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 60)
+    BIGGER_FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 75)
+
+    BUTTONS = [EASY, MEDIUM, HARD]
+
+    def __init__(self, screen):
+        super().__init__(screen, D2menu.TITLE, D2menu.BUTTONS,
+                         D2menu.FONT_OF_TITLE, D2menu.FONT_OF_TEXT, D2menu.BIGGER_FONT_OF_TEXT)
+    def press_button(self, game):
+        if game.d2_menu.flag == 0:
+            game.d2_menu.flag = 1
+        else:
+            button_text = self.buttons[self.chosen_button_number].inbox_text
+            if button_text == D2menu.EASY:
+                game.state = 'Easy'
+                print("Как же заебал этот баг")
+            if button_text == D2menu.MEDIUM:
+                print("А этот еще не успел")
+            if button_text == D2menu.HARD:
+                print("Жопа")
+
+class GameOverMenu(Menu):
+    TITLE = 'Game Over'
+    #SCORETITLE = 'Score'
+    #HEALTHTITLE = 'Health'
+    #TIMETITLE = 'Time'
+    #RECORDTITLE = 'Record'
+    MENU = 'Go To Menu'
+
+    FONT_OF_TITLE = pg.font.Font(Font.GOTHIC, 90)
+    FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 60)
+    BIGGER_FONT_OF_TEXT = pg.font.Font(Font.GOTHIC, 75)
+
+    BUTTONS = [MENU]
+
+    def __init__(self, screen):
+        super().__init__(screen, GameOverMenu.TITLE, #GameOverMenu.SCORETITLE, GameOverMenu.HEALTHTITLE,
+                         #GameOverMenu.TIMETITLE, GameOverMenu.RECORDTITLE,
+                         PauseMenu.BUTTONS, PauseMenu.FONT_OF_TITLE, PauseMenu.FONT_OF_TEXT, PauseMenu.BIGGER_FONT_OF_TEXT)
+
+    def press_button(self, game):
+        game.main_menu.chosen_button_number = 0
+        game.state = 'MainMenu'
